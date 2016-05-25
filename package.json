@@ -1,0 +1,19 @@
+{
+  "name": "generate-sprite-by-video",
+  "version": "1.0.0",
+  "description": "The \"generate-sprite-by-video\" is a js library that can be used to generate sprites by video file using ImageMagick.",
+  "main": "server.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lidox/generate-sprite-by-video.git"
+  },
+  "author": "Artur Schäfer",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lidox/generate-sprite-by-video/issues"
+  },
+  "homepage": "https://github.com/lidox/generate-sprite-by-video#readme"
+}
