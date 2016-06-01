@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/lidox/generate-sprite-by-video/issues"
   },
-  "homepage": "https://github.com/lidox/generate-sprite-by-video#readme"
+  "homepage": "https://github.com/lidox/generate-sprite-by-video#readme",
+  "dependencies": {
+    "express": "^4.13.4"
+  }
 }
