@@ -3,7 +3,6 @@ var app = express();
 var path = require('path');
 var port = 443;
 
-
 // middleware
 app.use(express.static(__dirname + '/public'));
 
@@ -16,6 +15,14 @@ app.get('/', function (req, res) {
 app.listen(port, function () {
     console.log('App listening on port ' + port);
     //executeBatch();
+	// "C:\Program Files\ImageMagick\ffmpeg.exe" -i C:\Users\artur\Desktop\testing\video.mp4 -r 1/15 -vf scale=400:-1 C:\Users\artur\Desktop\testing\example-video%03d.png
+	// "C:\Program Files\ImageMagick\montage.exe" C:\Users\artur\Desktop\testing\example-video*.png -tile x1 -geometry +0+0 C:\Users\artur\Desktop\testing\example-video-sprite.png
+	var im = require('imagemagick');
+	im.montage(['C:\\Users\\artur\\Desktop\\testing\\example-video*.png', '-tile', 'x1', '-geometry', '+0+0', 'C:\\Users\\artur\\Desktop\\testing\\example-video-sprite-node.png'],
+	function(err, metadata){
+		if (err) throw err
+		console.log('stdout:', stdout);
+	});
 });
 
 function executeBatch() {

@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/lidox/generate-sprite-by-video#readme",
   "dependencies": {
-    "express": "^4.13.4"
+    "express": "^4.13.4",
+    "imagemagick": "^0.1.3"
   }
 }
