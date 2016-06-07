@@ -1,3 +1,54 @@
+var path = require('path');
+
+exports.executeBatch = function() {
+    var batchFileWithPath = 'batch/convert.bat';
+    var spawn = require('child_process').spawn,
+    ls = spawn('cmd.exe', ['/c', batchFileWithPath]);
+
+    ls.stdout.on('data', function (data) {
+        console.log('stdout: ' + data);
+    });
+
+    ls.stderr.on('data', function (data) {
+        console.log('stderr: ' + data);
+    });
+
+    ls.on('exit', function (code) {
+        console.log('child process exited with code ' + code);
+    });
+}
+exports.executeBatch.path = 'executeBatch';
+
+exports.execCLI = function(pathToFfmpeg, pathToVideo, imgPerSecond, widthPerImage, imagesToUse) {
+	const exec = require('child_process').exec;
+	var cliCommand = pathToFfmpeg + ' -i ' + pathToVideo + ' -r 1/' + imgPerSecond + ' -vf scale=' + widthPerImage + ':-1 ' + imagesToUse;
+	console.log('cliCommand: ' + cliCommand);
+	const child = exec(cliCommand,
+		(error, stdout, stderr) => {
+			console.log(`stdout: ${stdout}`);
+			console.log(`stderr: ${stderr}`);
+			if (error !== null) {
+				console.log(`exec error: ${error}`);
+			}
+	});
+	// TODO: delete png after sprite done
+}
+exports.execCLI.path = 'execCLI';
+
+exports.execCommand = function(command, callback) {
+	const exec = require('child_process').exec;
+	const child = exec(command,
+		(error, stdout, stderr) => {
+			console.log(`stdout: ${stdout}`);
+			console.log(`stderr: ${stderr}`);
+			if (error !== null) {
+				console.log(`exec error: ${error}`);
+			}
+		callback();
+	});
+}
+exports.execCommand.path = 'execCommand';
+
 exports.montage = function(args, timeout, callback) {
   var procopt = {encoding: 'binary'};
   if (typeof timeout === 'function') {
