@@ -1,4 +1,5 @@
 {
     "imagemagickDirectory": "\"C:\\Program Files\\ImageMagick-6.9.3-Q16",
+	"logFile": "C:\\Users\\schaefa\\Desktop\\Testing\\log.txt",
     "port": 443
 }
