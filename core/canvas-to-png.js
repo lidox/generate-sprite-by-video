@@ -1,9 +1,11 @@
 var Canvas = require('canvas'),
 	Image = Canvas.Image,
 	fs = require('fs'),
-	path = require('path'),
-	async = require('async');
+	path = require('path');
+	//async = require('async');
 
+// https://developer.mozilla.org/de/docs/Web/API/HTMLCanvasElement/toBlob
+// https://github.com/Automattic/node-canvas
 function Canvas2PNG(imgList) {
 	/*if(typeof srcList !== 'object' || srcList.length <= 0 || typeof srcList[0] !== 'string'){
 		throw new TypeError('Invalid arguments');
@@ -11,26 +13,29 @@ function Canvas2PNG(imgList) {
 	
 	var img = new Image();
 	img.src = imgList[0];
-	img.onload = function(){
-		var baseWidth = img.width,
-			baseHeight = img.height;
+	//img.onload = function(){
+	var baseWidth = img.width,
+		baseHeight = img.height;
 
-		var canvas = new Canvas(baseWidth * srcList.length, baseHeight);
-		var ctx = canvas.getContext('2d');
-		console.log(imgList);
-		async.forEachOf(imgList, function(i, element){
-			console.log('...' + i + ':' + element);
-		});
-		/*for (var i = 0; i< srcList.length; i++) {
-			img = new Image();
-			img.src = imgList[i];
-			ctx.drawImage(img,i * baseWidth, 0);
-		}*/
+	var canvas = new Canvas(baseWidth * imgList.length, baseHeight);
+	var ctx = canvas.getContext('2d');
+	//console.log(imgList);
+
+	/*
+	async.forEachOf(imgList, function(i, element){
+		console.log('...' + i + ':' + element);
+	});
+	*/
+
+	for (var i = 0; i< imgList.length; i++) {
+		img = new Image();
+		img.src = imgList[i];
+		ctx.drawImage(img,i * baseWidth, 0);
 	}
-	//this.canvas = canvas;//return canvas.toDataURL("image/png");
+	//}
+	this.canvas = canvas;
+	return canvas.toDataURL("image/png");
 }
-// https://developer.mozilla.org/de/docs/Web/API/HTMLCanvasElement/toBlob
-// https://github.com/Automattic/node-canvas
 
 Canvas2PNG.prototype.canvas = undefined;
 
