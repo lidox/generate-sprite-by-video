@@ -68,29 +68,6 @@ Canvas2PNG.prototype.writeFile = function(file){
 	});
 }
 
-/*Canvas2PNG.prototype.generateSprite = function(srcList) {
-	
-	if(typeof srcList !== 'object' || srcList.length <= 0 || typeof srcList[0] !== 'string'){
-		throw new TypeError('Invalid arguments');
-	}
-	
-	var img = new Image();
-	img.src = srcList[0];
-	img.onload = function(){
-	var baseWidth = img.width,
-		baseHeight = img.height;
-	
-	var canvas = new Canvas(baseWidth * srcList.length, baseHeight);
-	var ctx = canvas.getContext('2d');
-	for (var i = 0; i< srcList.length; i++) {
-		img = new Image();
-		img.src = srcList[i];
-		ctx.drawImage(img,i * baseWidth, 0);
-	}
-	return canvas.toDataURL("image/png");
-	}
-};*/
-
 Canvas2PNG.dummyThumbs = function(width, height, count) {
 	var thumbList = [];
 	
@@ -108,34 +85,8 @@ Canvas2PNG.dummyThumbs = function(width, height, count) {
 	return thumbList;
 }
 
-/*
-Canvas2PNG.prototype.getDataUri = function(url, callback) {
-    var image = new Image();
-	image.src = url;
-    image.onload = function () {
-        var canvas = new Canvas(this.width, this.height),
-			ctx = canvas.getContext('2d');
-		ctx.drawImage(this, 0, 0, this.width, this.height);
-		url = canvas.toDataURL('image/png')
-        callback(url);
-    };
-}
-
-Canvas2PNG.prototype.getImages = function() {
-	var pathToImageList = ['C:\\Users\\schaefa\\Desktop\\Testing\\thumbs\\2c14cc7b-636b-4d8e-ab8b-7f3f21f89ae8\\thumb_000.jpg', 'C:\\Users\\schaefa\\Desktop\\Testing\\thumbs\\2c14cc7b-636b-4d8e-ab8b-7f3f21f89ae8\\thumb_001.jpg', 'C:\\Users\\schaefa\\Desktop\\Testing\\thumbs\\2c14cc7b-636b-4d8e-ab8b-7f3f21f89ae8\\thumb_002.jpg', 'C:\\Users\\schaefa\\Desktop\\Testing\\thumbs\\2c14cc7b-636b-4d8e-ab8b-7f3f21f89ae8\\thumb_003.jpg', 'C:\\Users\\schaefa\\Desktop\\Testing\\thumbs\\2c14cc7b-636b-4d8e-ab8b-7f3f21f89ae8\\thumb_004.jpg', 'C:\\Users\\schaefa\\Desktop\\Testing\\thumbs\\2c14cc7b-636b-4d8e-ab8b-7f3f21f89ae8\\thumb_005.jpg'];
-	
-	var anImage = 'C:\\Users\\schaefa\\Desktop\\Testing\\thumbs\\2c14cc7b-636b-4d8e-ab8b-7f3f21f89ae8\\thumb_000.jpg';
-	
-	// Usage
-	this.getDataUri(anImage, function(dataUri) {
-		console.log('result boom: ' + dataUri);
-		// Do whatever you'd like with the Data URI!
-	});
-}
-*/
-
-Canvas2PNG.prototype.getImgList = function () {
-	var pathToImageList = ['C:\\Users\\schaefa\\Desktop\\Testing\\thumbs\\061bba2b-cb06-4814-8b61-16d5483ad7c6\\example-thumb001.png', 'C:\\Users\\schaefa\\Desktop\\Testing\\thumbs\\061bba2b-cb06-4814-8b61-16d5483ad7c6\\example-thumb002.png'];
+Canvas2PNG.prototype.getImgList = function (imagaPaths) {
+	var pathToImageList = imagaPaths;//['C:\\Users\\schaefa\\Desktop\\Testing\\thumbs\\061bba2b-cb06-4814-8b61-16d5483ad7c6\\example-thumb001.png', 'C:\\Users\\schaefa\\Desktop\\Testing\\thumbs\\061bba2b-cb06-4814-8b61-16d5483ad7c6\\example-thumb002.png'];
 	
 	var imgList = [];
 	for (var i = 0; i < pathToImageList.length; ++i) {
@@ -144,26 +95,44 @@ Canvas2PNG.prototype.getImgList = function () {
 	return imgList;
 };
 
-Canvas2PNG.prototype.readImage = function (divElem, callback) {
-	var image = new Image();
-    image.src = divElem;
-    image.onload = function(){
-        callback(image);
-    };
-};
-
-// function to encode file data to base64 encoded string
 Canvas2PNG.prototype.getBase64_encode = function (file) {
-    // read binary data
     var bitmap = fs.readFileSync(file);
-    // convert binary data to base64 encoded string
 	var dataURL = 'data:image/png;base64,' + new Buffer(bitmap).toString('base64')
     return dataURL;
 }
 
+Canvas2PNG.prototype.getAllImagePathsByFolderPath = function (folderPath, imageName) {
+	var imagePaths = [];
+	fs.realpath(folderPath, function(err, path) {
+		if (err) {
+			console.log(err);
+		 return;
+		}
+		console.log('Path is : ' + path);
+	});
+	
+	var files = fs.readdirSync(folderPath);
+	files.forEach(function(f) {
+		var imageFile = path.join(folderPath, f);
+		if(f.startsWith(imageName)){
+			imagePaths.push(imageFile);
+			console.log(imageFile);
+		}
 
-
-
+	});
+	/*fs.readdir(folderPath, function(err, files) {
+		if (err) return;
+		files.forEach(function(f) {
+			var imageFile = path.join(folderPath, f);
+			if(f.startsWith(imageName)){
+				imagePaths.push(imageFile);
+				console.log(imageFile);
+			}
+			
+		});
+	});*/
+	return imagePaths;
+}
 
 // export the class
 module.exports = Canvas2PNG;

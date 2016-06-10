@@ -19,10 +19,24 @@ app.get('/', function (req, res) {
 
 app.listen(port, function () {
     console.log('App listening on port ' + port);	
-    generatePNGs();
+    // generate thumbs by video
+	generatePNGs();
 	
-	//var generator = new Canvas2PNG();
-	//generator.generatePNG();
+	// boring stuff
+	var urls = Canvas2PNG.dummyThumbs(300,150,1);
+	var test = new Canvas2PNG(urls);
+
+	// Pfad zu den dateien
+	var imagaPaths = test.getAllImagePathsByFolderPath('C:\\Users\\schaefa\\Desktop\\Testing\\thumbs\\061bba2b-cb06-4814-8b61-16d5483ad7c6', 'example-thumb')
+
+	// read images to memory
+	var images = test.getImgList(imagaPaths);
+
+	// create sprite via  canvas
+	var sprite = new Canvas2PNG(images);
+
+	// write sprite to disc
+	sprite.writeFile('test.png');
 	
 });
 
@@ -77,16 +91,4 @@ function generatePNGs(){
 
 	}
     console.log('generate pngs finished!');
-	
-	
-	
-	//get Video length
-	//var videoLength = execCommand(pathToFfmpeg +' -i \"' + pathToVideo + '\" 2>&1');
-	//console.log('videoLength: ' + videoLength);
-	
-	// get seconds per video
-	
-	//var vtt = new VTTCreator();
-	//var secsPerImgae = vtt.getSecondsPerImageByImgNr(50,25);
-	//console.log('seconds per image: ' + secsPerImgae);
 }
