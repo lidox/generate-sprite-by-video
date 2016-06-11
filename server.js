@@ -21,6 +21,7 @@ app.listen(port, function () {
     console.log('App listening on port ' + port);	
     // generate thumbs by video
     	
+    	// var firstArgument = process.argv[2]; //  -> node server.js firstArgument secondArgument
     	// generateSprite('C:\\path-to-movies-folder' , 'path-to-thumbs-folder', 10)
 	generatePNGs();
 	
