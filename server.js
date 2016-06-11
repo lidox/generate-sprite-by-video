@@ -20,6 +20,8 @@ app.get('/', function (req, res) {
 app.listen(port, function () {
     console.log('App listening on port ' + port);	
     // generate thumbs by video
+    	
+    	// generateSprite('C:\\path-to-movies-folder' , 'path-to-thumbs-folder', 10)
 	generatePNGs();
 	
 	// boring stuff
