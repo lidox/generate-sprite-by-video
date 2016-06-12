@@ -1,5 +1,8 @@
 {
     "imagemagickDirectory": "\"C:\\Program Files\\ImageMagick-6.9.3-Q16",
 	"logFile": "C:\\Users\\schaefa\\Desktop\\Testing\\log.txt",
-    "port": 443
+    "port": 443,
+	"thumbName": "example-thumb",
+	"thumbImageWidth": 400,
+	"videoName": "v_1_50.mp4"
 }

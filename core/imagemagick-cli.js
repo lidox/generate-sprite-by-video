@@ -31,9 +31,26 @@ exports.execCLI = function(pathToFfmpeg, pathToVideo, imgPerSecond, widthPerImag
 				console.log(`exec error: ${error}`);
 			}
 	});
-	// TODO: delete png after sprite done
 }
 exports.execCLI.path = 'execCLI';
+
+//"C:\Program Files\ImageMagick-6.9.3-Q16\montage.exe" C:\Users\schaefa\Videos\example-video*.png -tile x1 -geometry +0+0 C:\Users\schaefa\Videos\example-video-sprite.png
+exports.runMontage = function(pathToMontage, pathToThumbs, pathToSprite) {
+	const exec = require('child_process').exec;
+	var cliCommand = pathToMontage + ' ' + pathToThumbs + ' -tile x1 -geometry +0+0 ' + pathToSprite;
+	console.log('cliCommand: ' + cliCommand);
+	const child = exec(cliCommand,
+		(error, stdout, stderr) => {
+			console.log(`stdout: ${stdout}`);
+			console.log(`stderr: ${stderr}`);
+			if (error !== null) {
+				console.log(`exec error: ${error}`);
+			}
+	});
+	// TODO: delete png after sprite done
+}
+exports.runMontage.path = 'runMontage';
+
 
 exports.execCommand = function(command, callback) {
 	const exec = require('child_process').exec;

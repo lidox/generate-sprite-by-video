@@ -21,26 +21,22 @@ app.listen(port, function () {
     console.log('App listening on port ' + port);	
     // generate thumbs by video
     	
-    	// var firstArgument = process.argv[2]; //  -> node server.js firstArgument secondArgument
+		/*
+		var firstArgument = process.argv[2]; //  -> node server.js firstArgument secondArgument
+		if ( typeof firstArgument === 'undefined')
+		{
+		  //do stuff if firstArgument is defined
+		}
+		*/
     	// generateSprite('C:\\path-to-movies-folder' , 'path-to-thumbs-folder', 10)
-	generatePNGs();
+	var path2thumbnails = 'C:\\Users\\schaefa\\Desktop\\Testing\\thumbs';
+    var path2videos = 'C:\\Users\\schaefa\\Desktop\\Testing\\movies';
+	var imgCountPerVideo = '10';
+	var spriteName = 'sprite.png';
 	
-	// boring stuff
-	var urls = Canvas2PNG.dummyThumbs(300,150,1);
-	var test = new Canvas2PNG(urls);
-
-	// Pfad zu den dateien
-	var imagaPaths = test.getAllImagePathsByFolderPath('C:\\Users\\schaefa\\Desktop\\Testing\\thumbs\\061bba2b-cb06-4814-8b61-16d5483ad7c6', 'example-thumb')
-
-	// read images to memory
-	var images = test.getImgList(imagaPaths);
-
-	// create sprite via  canvas
-	var sprite = new Canvas2PNG(images);
-
-	// write sprite to disc
-	sprite.writeFile('test.png');
-	
+	generateThumbs(path2thumbnails, path2videos, imgCountPerVideo);
+	generateSprite(path2thumbnails, path2videos, spriteName);
+	//TODO: DELETE thumbs
 });
 
 function getDirectories(srcpath) {
@@ -49,17 +45,17 @@ function getDirectories(srcpath) {
   });
 }
 
-function generatePNGs(){
+function generateThumbs(path2thumbnails, path2videos, imgCountPerVideo){
 	//var PATH2SPRITE = 'C:\\Users\\russland\\Desktop\\Testing\\thumbs';
     //var PATH2VIDEO = 'C:\\Users\\russland\\Desktop\\Testing\\movies';
-    var PATH2SPRITE = 'C:\\Users\\schaefa\\Desktop\\Testing\\thumbs';
-    var PATH2VIDEO = 'C:\\Users\\schaefa\\Desktop\\Testing\\movies';
-	var logFile = config.logFile;
+    var PATH2SPRITE = path2thumbnails; //'C:\\Users\\schaefa\\Desktop\\Testing\\thumbs';
+    var PATH2VIDEO = path2videos; //'C:\\Users\\schaefa\\Desktop\\Testing\\movies';
+	var imgPerSecond = imgCountPerVideo;//'10';
 	
-	var IMAGENAME = 'example-thumb';
-	var imgPerSecond = '10';
-	var widthPerImage = '400';
-    var VIDEO_NAME = 'v_1_50.mp4';
+	var IMAGENAME = config.thumbName;
+	var logFile = config.logFile;
+	var widthPerImage = config.thumbImageWidth;
+    var VIDEO_NAME = config.videoName;
 	
 	//iterate over all folders inside movie folder:
 	var guidList = getDirectories(PATH2VIDEO);
@@ -92,6 +88,34 @@ function generatePNGs(){
             im.execCLI(pathToFfmpeg,  pathToVideo, imgPerSecond, widthPerImage, imagesToUse);
         }
 
+	}
+    console.log('generate pngs finished!');
+}
+4// command: "C:\Program Files\ImageMagick-6.9.3-Q16\montage.exe" C:\Users\schaefa\Videos\example-video*.png -tile x1 -geometry +0+0 C:\Users\schaefa\Videos\example-video-sprite.png
+function generateSprite(path2thumbnails, path2videos, spriteName){ 
+    var PATH2THUMBS = path2thumbnails;
+    var PATH2VIDEO = path2videos;
+	
+	var IMAGENAME = config.thumbName;
+	var logFile = config.logFile;
+	var widthPerImage = config.thumbImageWidth;
+    var VIDEO_NAME = config.videoName;
+	
+	//iterate over all folders inside movie folder:
+	var guidList = getDirectories(PATH2VIDEO);
+	var index;
+	for (index = 0; index < guidList.length; ++index) {
+        //var VIDEO = path.join(path.join(PATH2VIDEO , guidList[index]), VIDEO_NAME); 
+        var PATH_TO_THUMBS = path.join(PATH2THUMBS, guidList[index]);                    
+		var imageMagickDir = config.imagemagickDirectory;
+		var MONTAGE = path.join(imageMagickDir, 'montage.exe'); 
+		var pathToMontage = path.join(path.dirname(MONTAGE) , path.basename(MONTAGE));
+		var pathToThumbs = path.join(PATH_TO_THUMBS , path.basename(IMAGENAME +'*.png'));
+		//var pathToVideo = path.join(path.dirname(VIDEO) , path.basename(VIDEO));
+		var pathToSprite = path.join(PATH_TO_THUMBS , path.basename(spriteName));
+		console.log('------------------');
+		console.log(index+ '. Versuch für montage');
+		im.runMontage(pathToMontage, pathToThumbs, pathToSprite);
 	}
     console.log('generate pngs finished!');
 }
