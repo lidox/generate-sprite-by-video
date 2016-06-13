@@ -4,7 +4,7 @@ var app = express();
 var path = require('path');
 var port = config.port;
 var VTTCreator = require('./core/vtt-creator.js');
-var Canvas2PNG = require('./core/canvas-to-png.js');
+//ar Canvas2PNG = require('./core/canvas-to-png.js');
 var im = require('./core/imagemagick-cli.js');
 var fs = require('fs');
 
@@ -29,13 +29,15 @@ app.listen(port, function () {
 		}
 		*/
     	// generateSprite('C:\\path-to-movies-folder' , 'path-to-thumbs-folder', 10)
-	var path2thumbnails = 'C:\\Users\\schaefa\\Desktop\\Testing\\thumbs';
-    var path2videos = 'C:\\Users\\schaefa\\Desktop\\Testing\\movies';
+	var path2thumbnails = 'C:\\Users\\artur\\Desktop\\Testing\\thumbs';
+    var path2videos = 'C:\\Users\\artur\\Desktop\\Testing\\movies';
 	var imgCountPerVideo = '10';
+	imgCountPerVideo = imgCountPerVideo - 2;
 	var spriteName = 'sprite.png';
 	
+	//C:\Users\artur\Desktop\Testing\movies
 	generateThumbs(path2thumbnails, path2videos, imgCountPerVideo);
-	generateSprite(path2thumbnails, path2videos, spriteName);
+	//generateSprite(path2thumbnails, path2videos, spriteName);
 	//TODO: DELETE thumbs
 });
 
@@ -46,11 +48,8 @@ function getDirectories(srcpath) {
 }
 
 function generateThumbs(path2thumbnails, path2videos, imgCountPerVideo){
-	//var PATH2SPRITE = 'C:\\Users\\russland\\Desktop\\Testing\\thumbs';
-    //var PATH2VIDEO = 'C:\\Users\\russland\\Desktop\\Testing\\movies';
     var PATH2SPRITE = path2thumbnails; //'C:\\Users\\schaefa\\Desktop\\Testing\\thumbs';
     var PATH2VIDEO = path2videos; //'C:\\Users\\schaefa\\Desktop\\Testing\\movies';
-	var imgPerSecond = imgCountPerVideo;//'10';
 	
 	var IMAGENAME = config.thumbName;
 	var logFile = config.logFile;
@@ -79,19 +78,25 @@ function generateThumbs(path2thumbnails, path2videos, imgCountPerVideo){
         }
         else {         
             var imageMagickDir = config.imagemagickDirectory;
-            var FFMPEG = imageMagickDir+'\\ffmpeg.exe\"';
+            var FFMPEG = path.join(imageMagickDir, 'ffmpeg.exe"');
             var pathToFfmpeg = path.join(path.dirname(FFMPEG) , path.basename(FFMPEG));
             var pathToVideo = path.join(path.dirname(VIDEO) , path.basename(VIDEO));
             var imagesToUse = path.join(PATH_TO_THUMBS , path.basename(IMAGENAME +'%03d.png'));
             console.log('------------------');
             console.log(index+ '. Versuch');
+			
+			var vtt = new VTTCreator();
+			console.log('start cli--------------------');
+			var videoInSeconds = im.getVideoDurationInSeconds(pathToFfmpeg, pathToVideo);
+			console.log('end CLI --------------------');
+			var imgPerSecond = vtt.getSecondsPerImageByImgNr(videoInSeconds, imgCountPerVideo);
             im.execCLI(pathToFfmpeg,  pathToVideo, imgPerSecond, widthPerImage, imagesToUse);
         }
 
 	}
     console.log('generate pngs finished!');
 }
-4// command: "C:\Program Files\ImageMagick-6.9.3-Q16\montage.exe" C:\Users\schaefa\Videos\example-video*.png -tile x1 -geometry +0+0 C:\Users\schaefa\Videos\example-video-sprite.png
+// command: "C:\Program Files\ImageMagick-6.9.3-Q16\montage.exe" C:\Users\schaefa\Videos\example-video*.png -tile x1 -geometry +0+0 C:\Users\schaefa\Videos\example-video-sprite.png
 function generateSprite(path2thumbnails, path2videos, spriteName){ 
     var PATH2THUMBS = path2thumbnails;
     var PATH2VIDEO = path2videos;

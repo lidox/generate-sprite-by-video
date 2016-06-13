@@ -20,17 +20,9 @@ exports.executeBatch = function() {
 exports.executeBatch.path = 'executeBatch';
 
 exports.execCLI = function(pathToFfmpeg, pathToVideo, imgPerSecond, widthPerImage, imagesToUse) {
-	const exec = require('child_process').exec;
+	var c = require('child_process');
 	var cliCommand = pathToFfmpeg + ' -i ' + pathToVideo + ' -r 1/' + imgPerSecond + ' -vf scale=' + widthPerImage + ':-1 ' + imagesToUse;
-	console.log('cliCommand: ' + cliCommand);
-	const child = exec(cliCommand,
-		(error, stdout, stderr) => {
-			console.log(`stdout: ${stdout}`);
-			console.log(`stderr: ${stderr}`);
-			if (error !== null) {
-				console.log(`exec error: ${error}`);
-			}
-	});
+	var result = c.exec(cliCommand);
 }
 exports.execCLI.path = 'execCLI';
 
@@ -50,6 +42,18 @@ exports.runMontage = function(pathToMontage, pathToThumbs, pathToSprite) {
 	// TODO: delete png after sprite done
 }
 exports.runMontage.path = 'runMontage';
+
+// 2>&1 | grep 'Duration' | cut -d ' ' -f 4 | sed s/,//
+exports.getVideoDurationInSeconds = function(pathToFfmpeg, pathToVideo) {
+	var c = require('child_process');
+	var cliCommand = pathToFfmpeg + ' -i ' + pathToVideo + ' 2>&1 | grep \'Duration\' | cut -d \' \' -f 4 | sed s/,//';
+	var duration = c.execSync(cliCommand);
+	
+	var a = duration.toString().split(':'); 
+	var seconds = (+a[0]) * 60 * 60 + (+a[1]) * 60 + (+a[2]); 
+    return seconds;
+}
+exports.getVideoDurationInSeconds.path = 'getVideoDurationInSeconds';
 
 
 exports.execCommand = function(command, callback) {

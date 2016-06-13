@@ -10,4 +10,7 @@ NOW CANVAS DEPENDECIES: https://github.com/Automattic/node-canvas/wiki/Installat
 5.1 unzip to C:\GTK
 --------------------------------------------------------------------------------------------
 
-6. Install imagemagick
+6. Install imagemagick and check 'install legacy utilities'-checkbox
+7. git clone https://github.com/lidox/generate-sprite-by-video.git
+8. npm install //to install dependecies
+9. edit config.json
