@@ -1,4 +1,9 @@
 var path = require('path');
+var fs = require('fs');
+var config = require('../config/config.json');
+var port = config.port;
+var VTTCreator = require('./vtt-creator.js');
+var fs = require('fs');
 
 exports.executeBatch = function() {
     var batchFileWithPath = 'batch/convert.bat';
@@ -19,32 +24,23 @@ exports.executeBatch = function() {
 }
 exports.executeBatch.path = 'executeBatch';
 
-exports.execCLI = function(pathToFfmpeg, pathToVideo, imgPerSecond, widthPerImage, imagesToUse) {
+function execCLI(pathToFfmpeg, pathToVideo, imgPerSecond, widthPerImage, imagesToUse) {
 	var c = require('child_process');
 	var cliCommand = pathToFfmpeg + ' -i ' + pathToVideo + ' -r 1/' + imgPerSecond + ' -vf scale=' + widthPerImage + ':-1 ' + imagesToUse;
-	var result = c.exec(cliCommand);
+	var result = c.execSync(cliCommand);
 }
-exports.execCLI.path = 'execCLI';
 
-//"C:\Program Files\ImageMagick-6.9.3-Q16\montage.exe" C:\Users\schaefa\Videos\example-video*.png -tile x1 -geometry +0+0 C:\Users\schaefa\Videos\example-video-sprite.png
-exports.runMontage = function(pathToMontage, pathToThumbs, pathToSprite) {
-	const exec = require('child_process').exec;
+function runMontage(pathToMontage, pathToThumbs, pathToSprite) {
+	var c = require('child_process');
 	var cliCommand = pathToMontage + ' ' + pathToThumbs + ' -tile x1 -geometry +0+0 ' + pathToSprite;
-	console.log('cliCommand: ' + cliCommand);
-	const child = exec(cliCommand,
-		(error, stdout, stderr) => {
-			console.log(`stdout: ${stdout}`);
-			console.log(`stderr: ${stderr}`);
-			if (error !== null) {
-				console.log(`exec error: ${error}`);
-			}
-	});
-	// TODO: delete png after sprite done
+    var result = c.exec(cliCommand);
+	var deleteCommantd = 'rm -rf ' + pathToThumbs;
+	//var result = c.exec(deleteCommantd);
+	//fs.unlinkSync(pathToThumbs);
+	//console.log(deleteCommantd);
 }
-exports.runMontage.path = 'runMontage';
 
-// 2>&1 | grep 'Duration' | cut -d ' ' -f 4 | sed s/,//
-exports.getVideoDurationInSeconds = function(pathToFfmpeg, pathToVideo) {
+function getVideoDurationInSeconds(pathToFfmpeg, pathToVideo) {
 	var c = require('child_process');
 	var cliCommand = pathToFfmpeg + ' -i ' + pathToVideo + ' 2>&1 | grep \'Duration\' | cut -d \' \' -f 4 | sed s/,//';
 	var duration = c.execSync(cliCommand);
@@ -53,7 +49,82 @@ exports.getVideoDurationInSeconds = function(pathToFfmpeg, pathToVideo) {
 	var seconds = (+a[0]) * 60 * 60 + (+a[1]) * 60 + (+a[2]); 
     return seconds;
 }
-exports.getVideoDurationInSeconds.path = 'getVideoDurationInSeconds';
+
+function getDirectories(srcpath) {
+  return fs.readdirSync(srcpath).filter(function(file) {
+    return fs.statSync(path.join(srcpath, file)).isDirectory();
+  });
+}
+
+exports.generateThumbs = function(path2thumbnails, path2videos, imgCountPerVideo){
+    var PATH2SPRITE = path2thumbnails;
+    var PATH2VIDEO = path2videos;
+	
+	var IMAGENAME = config.thumbName;
+	var logFile = config.logFile;
+	var widthPerImage = config.thumbImageWidth;
+    var VIDEO_NAME = config.videoName;
+	
+	//iterate over all folders inside movie folder:
+	var guidList = getDirectories(PATH2VIDEO);
+	var index;
+	for (index = 0; index < guidList.length; ++index) {
+        var VIDEO = path.join(path.join(PATH2VIDEO , guidList[index]), VIDEO_NAME); 
+        var PATH_TO_THUMBS = path.join(PATH2SPRITE, guidList[index]);
+        if (!fs.existsSync(PATH_TO_THUMBS)){
+            fs.mkdirSync(PATH_TO_THUMBS);
+            console.log('create new folder: ' + PATH_TO_THUMBS);
+        }
+        
+        // check if video exists   
+        if (!fs.existsSync(VIDEO)){
+			var logMessage = 'video does not exist: ' + VIDEO;
+            console.log(logMessage);
+			var log = require('simple-node-logger').createSimpleFileLogger(logFile);
+			log.info(logMessage);
+        }
+        else {         
+            var imageMagickDir = config.imagemagickDirectory;
+            var FFMPEG = path.join(imageMagickDir, 'ffmpeg.exe"');
+            var pathToFfmpeg = path.join(path.dirname(FFMPEG) , path.basename(FFMPEG));
+            var pathToVideo = path.join(path.dirname(VIDEO) , path.basename(VIDEO));
+            var imagesToUse = path.join(PATH_TO_THUMBS , path.basename(IMAGENAME +'%03d.png'));
+            console.log('------------------');
+            console.log((index+1) + '. Video');
+			
+			var vtt = new VTTCreator();
+			var videoInSeconds = getVideoDurationInSeconds(pathToFfmpeg, pathToVideo);
+			var imgPerSecond = vtt.getSecondsPerImageByImgNr(videoInSeconds, imgCountPerVideo);
+            execCLI(pathToFfmpeg,  pathToVideo, imgPerSecond, widthPerImage, imagesToUse);
+        }
+
+	}
+}
+exports.generateThumbs.path = 'generateThumbs';
+
+exports.generateSprite = function(path2thumbnails, path2videos, spriteName){ 
+    var PATH2THUMBS = path2thumbnails;
+    var PATH2VIDEO = path2videos;
+	
+	var IMAGENAME = config.thumbName;
+	var logFile = config.logFile;
+	var widthPerImage = config.thumbImageWidth;
+    var VIDEO_NAME = config.videoName;
+	
+	//iterate over all folders inside movie folder:
+	var guidList = getDirectories(PATH2VIDEO);
+	var index;
+	for (index = 0; index < guidList.length; ++index) {
+        var PATH_TO_THUMBS = path.join(PATH2THUMBS, guidList[index]);                    
+		var imageMagickDir = config.imagemagickDirectory;
+		var MONTAGE = path.join(imageMagickDir, 'montage.exe"'); 
+		var pathToMontage = path.join(path.dirname(MONTAGE) , path.basename(MONTAGE));
+		var pathToThumbs = path.join(PATH_TO_THUMBS , path.basename(IMAGENAME +'*.png'));
+		var pathToSprite = path.join(PATH_TO_THUMBS , path.basename(spriteName));
+		runMontage(pathToMontage, pathToThumbs, pathToSprite);
+	}
+}
+exports.generateSprite.path = 'generateSprite';
 
 
 exports.execCommand = function(command, callback) {
