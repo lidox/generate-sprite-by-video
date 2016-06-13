@@ -1,0 +1,18 @@
+1. Install node.js: https://nodejs.org/en/download/
+2. Install git bash: https://git-scm.com/download/win
+
+
+--------------------------------------------------------------------------------------------
+NOW CANVAS DEPENDECIES: https://github.com/Automattic/node-canvas/wiki/Installation---Windows
+3. Install Python 2.7: https://www.python.org/downloads/
+4. Install gyp: npm install -g node-gyp
+5. Download (insert int broweser) http://ftp.gnome.org/pub/GNOME/binaries/win64/gtk+/2.22/gtk+-bundle_2.22.1-20101229_win64.zip
+5.1 unzip to C:\GTK
+--------------------------------------------------------------------------------------------
+
+6. Install imagemagick and check 'install legacy utilities'-checkbox
+7. git clone https://github.com/lidox/generate-sprite-by-video.git
+8. npm install //to install dependecies
+9. edit config.json
+10. run: node generate-sprite.js [path-to-movies] [path-to-thumbs] [thumbnail-count-per-sprite]w
+example: node generate-sprite.js C:\\Users\\artur\\Desktop\\Testing\\movies C:\\Users\\artur\\Desktop\\Testing\\thumbs 10
