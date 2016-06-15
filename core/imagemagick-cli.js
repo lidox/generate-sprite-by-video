@@ -37,7 +37,7 @@ function execCLI(pathToFfmpeg, pathToVideo, imgPerSecond, widthPerImage, imagesT
 
 function runMontage(pathToMontage, pathToThumbs, pathToSprite) {
 	var c = require('child_process');
-	var cliCommand = pathToMontage + ' ' + pathToThumbs + ' -tile x1 -geometry +0+0 ' + pathToSprite;
+	var cliCommand = 'START \"\" '+pathToMontage + ' ' + pathToThumbs + ' -tile x1 -geometry +0+0 ' + pathToSprite;
     var result = c.exec(cliCommand);
 	var deleteCommantd = 'rm -rf ' + pathToThumbs;
 	//var result = c.exec(deleteCommantd);
