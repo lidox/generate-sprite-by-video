@@ -24,7 +24,7 @@ imgCountPerVideo = imgCountPerVideo - 2;
 var spriteName = 'sprite.png';
 
 im.generateThumbs(path2thumbnails, path2videos, imgCountPerVideo);
-im.generateSprite(path2thumbnails, path2videos, spriteName);
+//im.generateSprite(path2thumbnails, path2videos, spriteName);
 //TODO: DELETE thumbs
 console.log('generating sprites should finish in some seconds...');
 

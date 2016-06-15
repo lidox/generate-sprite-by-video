@@ -1,6 +1,6 @@
 {
-    "imagemagickDirectory": "\"C:\\Program Files\\ImageMagick-6.9.3-Q16",
-	"logFile": "C:\\Users\\schaefa\\Desktop\\log.txt",
+    "imagemagickDirectory": "\"C:\\Program Files\\ImageMagick",
+	"logFile": "C:\\Users\\Russland\\Desktop\\log.txt",
     "port": 443,
 	"thumbName": "example-thumb",
 	"thumbImageWidth": 400,

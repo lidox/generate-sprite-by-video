@@ -26,8 +26,13 @@ exports.executeBatch.path = 'executeBatch';
 
 function execCLI(pathToFfmpeg, pathToVideo, imgPerSecond, widthPerImage, imagesToUse) {
 	var c = require('child_process');
-	var cliCommand = pathToFfmpeg + ' -i ' + pathToVideo + ' -r 1/' + imgPerSecond + ' -vf scale=' + widthPerImage + ':-1 ' + imagesToUse;
-	var result = c.execSync(cliCommand);
+	var cliCommand = 'START \"\" '+pathToFfmpeg + ' -i ' + pathToVideo + ' -r 1/' + imgPerSecond + ' -vf scale=' + widthPerImage + ':-1 ' + imagesToUse;
+	var result = c.exec(cliCommand);
+    /*var result = c.spawn('cmd', ['/c '+cliCommand, cliCommand]);
+    
+    result.on('close', (code) => {
+      console.log(`child process exited with code ${code}`);
+    });*/
 }
 
 function runMontage(pathToMontage, pathToThumbs, pathToSprite) {
@@ -44,7 +49,6 @@ function getVideoDurationInSeconds(pathToFfmpeg, pathToVideo) {
 	var c = require('child_process');
 	var cliCommand = pathToFfmpeg + ' -i ' + pathToVideo + ' 2>&1 | grep \'Duration\' | cut -d \' \' -f 4 | sed s/,//';
 	var duration = c.execSync(cliCommand);
-	
 	var a = duration.toString().split(':'); 
 	var seconds = (+a[0]) * 60 * 60 + (+a[1]) * 60 + (+a[2]); 
     return seconds;
