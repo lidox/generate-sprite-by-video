@@ -1,9 +1,13 @@
 var path = require('path');
 var fs = require('fs');
 var config = require('../config/config.json');
+var waitUntil = require('wait-until');
 var port = config.port;
 var VTTCreator = require('./vtt-creator.js');
 var fs = require('fs');
+var threadCounter = 0;
+var threadLimit = config.threadLimit;
+
 
 exports.executeBatch = function() {
     var batchFileWithPath = 'batch/convert.bat';
@@ -25,14 +29,24 @@ exports.executeBatch = function() {
 exports.executeBatch.path = 'executeBatch';
 
 function execCLI(pathToFfmpeg, pathToVideo, imgPerSecond, widthPerImage, imagesToUse) {
-	var c = require('child_process');
 	var cliCommand = 'START \"\" '+pathToFfmpeg + ' -i ' + pathToVideo + ' -r 1/' + imgPerSecond + ' -vf scale=' + widthPerImage + ':-1 ' + imagesToUse;
-	var result = c.exec(cliCommand);
-    /*var result = c.spawn('cmd', ['/c '+cliCommand, cliCommand]);
-    
-    result.on('close', (code) => {
-      console.log(`child process exited with code ${code}`);
-    });*/
+	var exec = require('child_process').exec;
+	threadCounter = threadCounter + 1;
+	//console.log('threadCounter = ' + threadCounter);
+	//console.log('Started FFMPEG for video ' + pathToVideo);
+	exec(cliCommand, function(error, stdout, stderr) {
+		threadCounter = threadCounter - 1;
+		//console.log('threadCounter = ' + threadCounter);
+		//console.log('stdout: ', stdout);
+		//console.log('stderr: ', stderr);
+		if (error !== null) {
+			console.log('exec error: ', error);
+		}
+		var logFile = config.logFile;
+		var log = require('simple-node-logger').createSimpleFileLogger(logFile);
+		log.info('Finished FFMPEG for video ' + pathToVideo);
+		console.log('Finished FFMPEG for video ' + pathToVideo);
+	});
 }
 
 function runMontage(pathToMontage, pathToThumbs, pathToSprite) {
@@ -66,6 +80,7 @@ exports.generateThumbs = function(path2thumbnails, path2videos, imgCountPerVideo
 	
 	var IMAGENAME = config.thumbName;
 	var logFile = config.logFile;
+	var log = require('simple-node-logger').createSimpleFileLogger(logFile);
 	var widthPerImage = config.thumbImageWidth;
     var VIDEO_NAME = config.videoName;
 	
@@ -84,7 +99,6 @@ exports.generateThumbs = function(path2thumbnails, path2videos, imgCountPerVideo
         if (!fs.existsSync(VIDEO)){
 			var logMessage = 'video does not exist: ' + VIDEO;
             console.log(logMessage);
-			var log = require('simple-node-logger').createSimpleFileLogger(logFile);
 			log.info(logMessage);
         }
         else {         
@@ -92,16 +106,25 @@ exports.generateThumbs = function(path2thumbnails, path2videos, imgCountPerVideo
             var FFMPEG = path.join(imageMagickDir, 'ffmpeg.exe"');
             var pathToFfmpeg = path.join(path.dirname(FFMPEG) , path.basename(FFMPEG));
             var pathToVideo = path.join(path.dirname(VIDEO) , path.basename(VIDEO));
-            var imagesToUse = path.join(PATH_TO_THUMBS , path.basename(IMAGENAME +'%03d.png'));
-            console.log('------------------');
-            console.log((index+1) + '. Video');
-			
+            var imagesToUse = path.join(PATH_TO_THUMBS , path.basename(IMAGENAME +'%03d.png'));	
 			var vtt = new VTTCreator();
 			var videoInSeconds = getVideoDurationInSeconds(pathToFfmpeg, pathToVideo);
 			var imgPerSecond = vtt.getSecondsPerImageByImgNr(videoInSeconds, imgCountPerVideo);
-            execCLI(pathToFfmpeg,  pathToVideo, imgPerSecond, widthPerImage, imagesToUse);
-        }
+			
+			//console.log('global threadCount=' +threadCounter);
+			//while(threadLimit===threadCounter){}
+			waitUntil()
+			.interval(1000)
+			.times(Infinity)
+			.condition(function() {
+				return (threadLimit!==threadCounter ? true : false);
+			})
+			.done(function(result) {
+				console.log('ThreadCounter=('+ threadCounter +') Started FFMPEG for video ' + pathToVideo);
+				execCLI(pathToFfmpeg,  pathToVideo, imgPerSecond, widthPerImage, imagesToUse);
+			});
 
+        }
 	}
 }
 exports.generateThumbs.path = 'generateThumbs';
@@ -135,8 +158,8 @@ exports.execCommand = function(command, callback) {
 	const exec = require('child_process').exec;
 	const child = exec(command,
 		(error, stdout, stderr) => {
-			console.log(`stdout: ${stdout}`);
-			console.log(`stderr: ${stderr}`);
+			//console.log(`stdout: ${stdout}`);
+			//console.log(`stderr: ${stderr}`);
 			if (error !== null) {
 				console.log(`exec error: ${error}`);
 			}

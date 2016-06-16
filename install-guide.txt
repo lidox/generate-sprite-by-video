@@ -15,5 +15,8 @@ NOW CANVAS DEPENDECIES: https://github.com/Automattic/node-canvas/wiki/Installat
 8. npm install //to install dependecies
 9. edit config.json
 10. run: node generate-sprite.js [path-to-movies] [path-to-thumbs] [thumbnail-count-per-sprite]w
-example: node generate-sprite.js C:\\Users\\Russland\\Desktop\\Testing\\movies C:\\Users\\Russland\\Desktop\\Testing\\thumbs 10
-node generate-sprite.js C:\\Users\\schaefa\\Desktop\\Testing\\movies C:\\Users\\schaefa\\Desktop\\Testing\\thumbs 10
+example: node generate-sprite.js C:\\Users\\artur\\Desktop\\Testing\\movies C:\\Users\\artur\\Desktop\\Testing\\thumbs 10
+
+
+
+i.) node generate-thumbs.js C:\\Users\\schaefa\\Desktop\\Testing\\movies C:\\Users\\schaefa\\Desktop\\Testing\\thumbs 50

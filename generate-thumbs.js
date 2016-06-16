@@ -23,10 +23,10 @@ var imgCountPerVideo = '10';
 imgCountPerVideo = imgCountPerVideo - 2;
 var spriteName = 'sprite.png';
 
-//im.generateThumbs(path2thumbnails, path2videos, imgCountPerVideo);
-im.generateSprite(path2thumbnails, path2videos, spriteName);
+im.generateThumbs(path2thumbnails, path2videos, imgCountPerVideo);
+//im.generateSprite(path2thumbnails, path2videos, spriteName);
 //TODO: DELETE thumbs
-console.log('generating sprites should finish in some seconds...');
+console.log('generating thumbs should finish in some seconds...');
 
 /* CANVAS: GENERATE SPRITE BY THUMBS
 // boring stuff
