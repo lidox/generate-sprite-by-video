@@ -6,9 +6,9 @@ The "generate-sprite-by-video" can be used to generate sprites by video file usi
 
 #Requirements
 
-- [Node.js](https://nodejs.org/en/download/)
-- ['grep' command](http://www.tutorialspoint.com/unix_commands/grep.htm)
-- [ImageMagick] (http://www.imagemagick.org/script/binary-releases.php)
+1. Install [Node.js](https://nodejs.org/en/download/)
+2. If your command line does not support ['grep' command](http://www.tutorialspoint.com/unix_commands/grep.htm), install [Git Bash](https://git-scm.com/downloads)
+3. Install [ImageMagick] (http://www.imagemagick.org/script/binary-releases.php) and check 'install legacy utilities'-checkbox
 
 ---------------
 
@@ -20,8 +20,6 @@ Install:
         
 Proper Use:
 ----
-You need to be in a Fiber to be able to use wait.for. The ideal place to launch a fiber
-is when a request arrives, to handle it:
 
 ```javascript
 node generate-thumbs.js [path-to-movies] [path-to-thumbs] [thumbnail-count]
