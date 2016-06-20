@@ -16,7 +16,8 @@ The "generate-sprite-by-video" can be used to generate sprites by video file usi
 Install: 
 ----
         1. git clone https://github.com/lidox/generate-sprite-by-video.git
-        2. npm install
+        2. 'npm install' in order to install dependecies
+        3. Edit config/config.json
         
 Proper Use:
 ----
