@@ -4,6 +4,7 @@
 
 #Introduction
 
+Example sprite:
 The "generate-sprite-by-video" can be used to generate sprites by video file using ImageMagick.
 
 #Requirements
