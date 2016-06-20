@@ -1,5 +1,7 @@
 #Generate sprite by video
 
+![spritename](https://cloud.githubusercontent.com/assets/7879175/16196433/3208a47c-36fe-11e6-8bd5-06393ddbfca6.png)
+
 #Introduction
 
 The "generate-sprite-by-video" can be used to generate sprites by video file using ImageMagick.
