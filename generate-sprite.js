@@ -14,12 +14,13 @@ if ( typeof path2videos === 'undefined')
 {
   console.log('Invalid! Use for example:  node generate-sprite.js C:\\\\Users\\\\artur\\\\Desktop\\\\Testing\\\\movies C:\\\\Users\\\\artur\\\\Desktop\\\\Testing\\\\thumbs 10');
 }
+else{
+	imgCountPerVideo = imgCountPerVideo - 2;
+	im.generateSprite(path2thumbnails, path2videos, "sprite.png");
+	//TODO: DELETE thumbs
+	console.log('generating sprites should finish in some seconds...');
+}
 
-
-imgCountPerVideo = imgCountPerVideo - 2;
-im.generateSprite(path2thumbnails, path2videos, "spriteName.png");
-//TODO: DELETE thumbs
-console.log('generating sprites should finish in some seconds...');
 
 /* CANVAS: GENERATE SPRITE BY THUMBS
 // boring stuff

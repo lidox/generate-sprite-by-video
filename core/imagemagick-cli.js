@@ -38,7 +38,8 @@ function execCLI(pathToFfmpeg, pathToVideo, imgPerSecond, widthPerImage, imagesT
 		})
 	.done(function(result) {	
 		//do work
-		var cliCommand = 'START \"\" '+pathToFfmpeg + ' -i ' + pathToVideo + ' -r 1/' + imgPerSecond + ' -vf scale=' + widthPerImage + ':-1 ' + imagesToUse;
+		var cliCommand = pathToFfmpeg + ' -i ' + pathToVideo + ' -r 1/' + imgPerSecond + ' -vf scale=' + widthPerImage + ':-1 ' + imagesToUse;
+		//var cliCommand = 'START \"\" '+pathToFfmpeg + ' -i ' + pathToVideo + ' -r 1/' + imgPerSecond + ' -vf scale=' + widthPerImage + ':-1 ' + imagesToUse;
 		var exec = require('child_process').exec;
 		threadCounter = threadCounter + 1;
 		exec(cliCommand, function(error, stdout, stderr) {
