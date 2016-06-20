@@ -29,34 +29,48 @@ exports.executeBatch = function() {
 exports.executeBatch.path = 'executeBatch';
 
 function execCLI(pathToFfmpeg, pathToVideo, imgPerSecond, widthPerImage, imagesToUse) {
-	var cliCommand = 'START \"\" '+pathToFfmpeg + ' -i ' + pathToVideo + ' -r 1/' + imgPerSecond + ' -vf scale=' + widthPerImage + ':-1 ' + imagesToUse;
-	var exec = require('child_process').exec;
-	threadCounter = threadCounter + 1;
-	//console.log('threadCounter = ' + threadCounter);
-	//console.log('Started FFMPEG for video ' + pathToVideo);
-	exec(cliCommand, function(error, stdout, stderr) {
-		threadCounter = threadCounter - 1;
-		//console.log('threadCounter = ' + threadCounter);
-		//console.log('stdout: ', stdout);
-		//console.log('stderr: ', stderr);
-		if (error !== null) {
-			console.log('exec error: ', error);
-		}
-		var logFile = config.logFile;
-		var log = require('simple-node-logger').createSimpleFileLogger(logFile);
-		log.info('Finished FFMPEG for video ' + pathToVideo);
-		console.log('Finished FFMPEG for video ' + pathToVideo);
+	
+	waitUntil()
+		.interval(1000)
+		.times(Infinity)
+		.condition(function() {
+			return (threadLimit!==threadCounter ? true : false);
+		})
+	.done(function(result) {	
+		//do work
+		var cliCommand = 'START \"\" '+pathToFfmpeg + ' -i ' + pathToVideo + ' -r 1/' + imgPerSecond + ' -vf scale=' + widthPerImage + ':-1 ' + imagesToUse;
+		var exec = require('child_process').exec;
+		threadCounter = threadCounter + 1;
+		exec(cliCommand, function(error, stdout, stderr) {
+			threadCounter = threadCounter - 1;
+			if (error !== null) {
+				console.log('exec error: ', error);
+			}
+			var logFile = config.logFile;
+			var log = require('simple-node-logger').createSimpleFileLogger(logFile);
+			log.info('Finished FFMPEG for video ' + pathToVideo);
+			console.log('Finished FFMPEG for video ' + pathToVideo);
+		});
+		// end work
+		
 	});
 }
 
 function runMontage(pathToMontage, pathToThumbs, pathToSprite) {
-	var c = require('child_process');
-	var cliCommand = 'START \"\" '+pathToMontage + ' ' + pathToThumbs + ' -tile x1 -geometry +0+0 ' + pathToSprite;
-    var result = c.exec(cliCommand);
-	var deleteCommantd = 'rm -rf ' + pathToThumbs;
-	//var result = c.exec(deleteCommantd);
-	//fs.unlinkSync(pathToThumbs);
-	//console.log(deleteCommantd);
+	
+	waitUntil()
+	.interval(1000)
+	.times(Infinity)
+	.condition(function() {
+		return (threadLimit!==threadCounter ? true : false);
+	})
+	.done(function(result) {
+		//do work
+		var c = require('child_process');
+		var cliCommand = 'START \"\" '+pathToMontage + ' ' + pathToThumbs + ' -tile x1 -geometry +0+0 ' + pathToSprite;
+		var result = c.exec(cliCommand);
+		// end work
+	});
 }
 
 function getVideoDurationInSeconds(pathToFfmpeg, pathToVideo) {
@@ -111,19 +125,8 @@ exports.generateThumbs = function(path2thumbnails, path2videos, imgCountPerVideo
 			var videoInSeconds = getVideoDurationInSeconds(pathToFfmpeg, pathToVideo);
 			var imgPerSecond = vtt.getSecondsPerImageByImgNr(videoInSeconds, imgCountPerVideo);
 			
-			//console.log('global threadCount=' +threadCounter);
-			//while(threadLimit===threadCounter){}
-			waitUntil()
-			.interval(1000)
-			.times(Infinity)
-			.condition(function() {
-				return (threadLimit!==threadCounter ? true : false);
-			})
-			.done(function(result) {
-				console.log('ThreadCounter=('+ threadCounter +') Started FFMPEG for video ' + pathToVideo);
-				execCLI(pathToFfmpeg,  pathToVideo, imgPerSecond, widthPerImage, imagesToUse);
-			});
-
+			console.log('ThreadCounter=('+ threadCounter +') Started FFMPEG for video ' + pathToVideo);
+			execCLI(pathToFfmpeg,  pathToVideo, imgPerSecond, widthPerImage, imagesToUse);
         }
 	}
 }
