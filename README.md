@@ -26,9 +26,15 @@ Proper Use:
 ----
 
 ```javascript
+// first generate thumbnails:
 node generate-thumbs.js [path-to-movies] [path-to-thumbs] [thumbnail-count]
 
 example: node generate-thumbs.js C:\\Users\\bob\\Desktop\\Testing\\movies C:\\Users\\bob\\Desktop\\Testing\\thumbs 50
+
+// then generate sprites:
+node generate-sprite.js [path-to-movies] [path-to-thumbs]
+
+example: node generate-sprite.js C:\\Users\\bob\\Desktop\\Testing\\movies C:\\Users\\bob\\Desktop\\Testing\\thumbs
 ```
 
 
