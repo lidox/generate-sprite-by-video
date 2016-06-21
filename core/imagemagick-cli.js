@@ -5,6 +5,8 @@ var waitUntil = require('wait-until');
 var port = config.port;
 var VTTCreator = require('./vtt-creator.js');
 var fs = require('fs');
+var logFile = config.logFile;
+var log = require('simple-node-logger').createSimpleFileLogger(logFile);
 var threadCounter = 0;
 var threadLimit = config.threadLimit;
 
@@ -42,13 +44,12 @@ function execCLI(pathToFfmpeg, pathToVideo, imgPerSecond, widthPerImage, imagesT
 		//var cliCommand = 'START \"\" '+pathToFfmpeg + ' -i ' + pathToVideo + ' -r 1/' + imgPerSecond + ' -vf scale=' + widthPerImage + ':-1 ' + imagesToUse;
 		var exec = require('child_process').exec;
 		threadCounter = threadCounter + 1;
+		console.log('New thread works on video: ' + pathToVideo +'  | ' + threadCounter+'/'+threadLimit +' threads active');
 		exec(cliCommand, function(error, stdout, stderr) {
 			threadCounter = threadCounter - 1;
 			if (error !== null) {
 				console.log('exec error: ', error);
 			}
-			var logFile = config.logFile;
-			var log = require('simple-node-logger').createSimpleFileLogger(logFile);
 			log.info('Finished FFMPEG for video ' + pathToVideo);
 			console.log('Finished FFMPEG for video ' + pathToVideo);
 		});
@@ -58,18 +59,28 @@ function execCLI(pathToFfmpeg, pathToVideo, imgPerSecond, widthPerImage, imagesT
 }
 
 function runMontage(pathToMontage, pathToThumbs, pathToSprite) {
-	
 	waitUntil()
-	.interval(1000)
-	.times(Infinity)
-	.condition(function() {
-		return (threadLimit!==threadCounter ? true : false);
-	})
+		.interval(1000)
+		.times(Infinity)
+		.condition(function() {
+			return (threadLimit!==threadCounter ? true : false);
+		})
 	.done(function(result) {
 		//do work
-		var c = require('child_process');
-		var cliCommand = 'START \"\" '+pathToMontage + ' ' + pathToThumbs + ' -tile x1 -geometry +0+0 ' + pathToSprite;
-		var result = c.exec(cliCommand);
+		threadCounter = threadCounter + 1;
+		console.log('New thread works on sprite: ' + pathToSprite +'  | ' + threadCounter+'/'+threadLimit +' threads active');
+		var exec = require('child_process').exec;
+		var cliCommand = pathToMontage + ' ' + pathToThumbs + ' -tile x1 -geometry +0+0 ' + pathToSprite;
+		exec(cliCommand, function(error, stdout, stderr) {
+			threadCounter = threadCounter - 1;
+			//console.log("threadCounter = "+threadCounter);
+			if (error !== null) {
+				log.error('Error: Failed to generate following sprite: ' + pathToSprite);
+				console.log('Error: Failed to generate following sprite: ' + pathToSprite);
+			}
+			log.info('Finished sprite ' + pathToSprite);
+			//console.log('Finished sprite ' + pathToSprite);
+		});
 		// end work
 	});
 }
@@ -94,8 +105,6 @@ exports.generateThumbs = function(path2thumbnails, path2videos, imgCountPerVideo
     var PATH2VIDEO = path2videos;
 	
 	var IMAGENAME = config.thumbName;
-	var logFile = config.logFile;
-	var log = require('simple-node-logger').createSimpleFileLogger(logFile);
 	var widthPerImage = config.thumbImageWidth;
     var VIDEO_NAME = config.videoName;
 	
@@ -126,7 +135,7 @@ exports.generateThumbs = function(path2thumbnails, path2videos, imgCountPerVideo
 			var videoInSeconds = getVideoDurationInSeconds(pathToFfmpeg, pathToVideo);
 			var imgPerSecond = vtt.getSecondsPerImageByImgNr(videoInSeconds, imgCountPerVideo);
 			
-			console.log('ThreadCounter=('+ threadCounter +') Started FFMPEG for video ' + pathToVideo);
+			//console.log('ThreadCounter=('+ threadCounter +') Started FFMPEG for video ' + pathToVideo);
 			execCLI(pathToFfmpeg,  pathToVideo, imgPerSecond, widthPerImage, imagesToUse);
         }
 	}
@@ -138,7 +147,6 @@ exports.generateSprite = function(path2thumbnails, path2videos, spriteName){
     var PATH2VIDEO = path2videos;
 	
 	var IMAGENAME = config.thumbName;
-	var logFile = config.logFile;
 	var widthPerImage = config.thumbImageWidth;
     var VIDEO_NAME = config.videoName;
 	
@@ -162,8 +170,6 @@ exports.execCommand = function(command, callback) {
 	const exec = require('child_process').exec;
 	const child = exec(command,
 		(error, stdout, stderr) => {
-			//console.log(`stdout: ${stdout}`);
-			//console.log(`stderr: ${stderr}`);
 			if (error !== null) {
 				console.log(`exec error: ${error}`);
 			}
