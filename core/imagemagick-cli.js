@@ -133,10 +133,17 @@ exports.generateThumbs = function(path2thumbnails, path2videos, imgCountPerVideo
             var imagesToUse = path.join(PATH_TO_THUMBS , path.basename(IMAGENAME +'%03d.png'));	
 			var vtt = new VTTCreator();
 			var videoInSeconds = getVideoDurationInSeconds(pathToFfmpeg, pathToVideo);
-			var imgPerSecond = vtt.getSecondsPerImageByImgNr(videoInSeconds, imgCountPerVideo);
 			
-			//console.log('ThreadCounter=('+ threadCounter +') Started FFMPEG for video ' + pathToVideo);
-			execCLI(pathToFfmpeg,  pathToVideo, imgPerSecond, widthPerImage, imagesToUse);
+			if(typeof videoInSeconds == "number"){
+				var imgPerSecond = vtt.getSecondsPerImageByImgNr(videoInSeconds, imgCountPerVideo);
+				execCLI(pathToFfmpeg,  pathToVideo, imgPerSecond, widthPerImage, imagesToUse);	
+			}
+			else{
+				var logMessage = 'Error: Invalid video length: ' + videoInSeconds +' | video:' + pathToVideo;
+				console.log(logMessage);
+				log.info(logMessage);
+			}
+			
         }
 	}
 }
