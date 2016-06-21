@@ -10,7 +10,7 @@ var path2videos = process.argv[2]; //  -> node server.js firstArgument secondArg
 var path2thumbnails = process.argv[3];
 var imgCountPerVideo = process.argv[4];
 
-if ( typeof path2videos === 'undefined')
+if ( (typeof path2videos === 'undefined')  && (typeof path2thumbnails === 'undefined') && (typeof imgCountPerVideo !== 'number') )
 {
   console.log('Invalid! Use for example:  node generate-sprite.js C:\\\\Users\\\\artur\\\\Desktop\\\\Testing\\\\movies C:\\\\Users\\\\artur\\\\Desktop\\\\Testing\\\\thumbs 10');
 }

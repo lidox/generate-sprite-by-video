@@ -30,6 +30,10 @@ exports.executeBatch = function() {
 }
 exports.executeBatch.path = 'executeBatch';
 
+function isNumber (o) {
+  return ! isNaN (o-0) && o !== null && o !== "" && o !== false;
+}
+
 function execCLI(pathToFfmpeg, pathToVideo, imgPerSecond, widthPerImage, imagesToUse) {
 	
 	waitUntil()
@@ -86,6 +90,20 @@ function runMontage(pathToMontage, pathToThumbs, pathToSprite) {
 }
 
 function getVideoDurationInSeconds(pathToFfmpeg, pathToVideo) {
+	/*
+	var c2 = require('child_process');
+	var cliCommand2 = pathToFfmpeg + ' -i ' + pathToVideo;
+	var duration2 = c2.execSync(cliCommand2);
+	console.log('duration2');
+	
+	// /Duration: ([0-9]+)(\.([0-9]+))?/
+	var regex = /Duration: ([0-9]+\:?[0-9]+\:[0-9]+\:[0-9]+\.+[0-9]+)/;          
+	//  /Duration: ([0-9]+\.?[0-9]*)/;
+	var result = duration2.match(regex);
+	duration = result[0];
+	console.log('BOOM duration'+duration);
+	*/
+	
 	var c = require('child_process');
 	var cliCommand = pathToFfmpeg + ' -i ' + pathToVideo + ' 2>&1 | grep \'Duration\' | cut -d \' \' -f 4 | sed s/,//';
 	var duration = c.execSync(cliCommand);
@@ -134,7 +152,7 @@ exports.generateThumbs = function(path2thumbnails, path2videos, imgCountPerVideo
 			var vtt = new VTTCreator();
 			var videoInSeconds = getVideoDurationInSeconds(pathToFfmpeg, pathToVideo);
 			
-			if(typeof videoInSeconds == "number"){
+			if(isNumber(videoInSeconds)){
 				var imgPerSecond = vtt.getSecondsPerImageByImgNr(videoInSeconds, imgCountPerVideo);
 				execCLI(pathToFfmpeg,  pathToVideo, imgPerSecond, widthPerImage, imagesToUse);	
 			}
