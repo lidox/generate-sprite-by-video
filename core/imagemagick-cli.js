@@ -5,8 +5,22 @@ var waitUntil = require('wait-until');
 var port = config.port;
 var VTTCreator = require('./vtt-creator.js');
 var fs = require('fs');
+
 var logFile = config.logFile;
-var log = require('simple-node-logger').createSimpleFileLogger(logFile);
+//var log = require('simple-node-logger').createSimpleFileLogger(logFile);
+var logging = require('winston');
+var log = new (logging.Logger)({
+  transports: [
+	new (logging.transports.Console)(),
+    new (logging.transports.File)({name: 'error-file',filename: logFile,level: 'error'})
+  ]
+});
+//log.add(log.transports.File, { filename: logFile });
+
+/*
+
+*/
+
 var threadCounter = 0;
 var threadLimit = config.threadLimit;
 
@@ -17,15 +31,15 @@ exports.executeBatch = function() {
     ls = spawn('cmd.exe', ['/c', batchFileWithPath]);
 
     ls.stdout.on('data', function (data) {
-        console.log('stdout: ' + data);
+        log.info('stdout: ' + data);
     });
 
     ls.stderr.on('data', function (data) {
-        console.log('stderr: ' + data);
+        log.info('stderr: ' + data);
     });
 
     ls.on('exit', function (code) {
-        console.log('child process exited with code ' + code);
+        log.info('child process exited with code ' + code);
     });
 }
 exports.executeBatch.path = 'executeBatch';
@@ -48,14 +62,13 @@ function execCLI(pathToFfmpeg, pathToVideo, imgPerSecond, widthPerImage, imagesT
 		//var cliCommand = 'START \"\" '+pathToFfmpeg + ' -i ' + pathToVideo + ' -r 1/' + imgPerSecond + ' -vf scale=' + widthPerImage + ':-1 ' + imagesToUse;
 		var exec = require('child_process').exec;
 		threadCounter = threadCounter + 1;
-		console.log('New thread works on video: ' + pathToVideo +'  | ' + threadCounter+'/'+threadLimit +' threads active');
+		log.info('New thread works on video: ' + pathToVideo +'  | ' + threadCounter+'/'+threadLimit +' threads active');
 		exec(cliCommand, function(error, stdout, stderr) {
 			threadCounter = threadCounter - 1;
 			if (error !== null) {
-				console.log('exec error: ', error);
+				log.error('exec error: ', error);
 			}
 			log.info('Finished FFMPEG for video ' + pathToVideo);
-			console.log('Finished FFMPEG for video ' + pathToVideo);
 		});
 		// end work
 		
@@ -72,38 +85,21 @@ function runMontage(pathToMontage, pathToThumbs, pathToSprite) {
 	.done(function(result) {
 		//do work
 		threadCounter = threadCounter + 1;
-		console.log('New thread works on sprite: ' + pathToSprite +'  | ' + threadCounter+'/'+threadLimit +' threads active');
+		log.info('New thread works on sprite: ' + pathToSprite +'  | ' + threadCounter+'/'+threadLimit +' threads active');
 		var exec = require('child_process').exec;
 		var cliCommand = pathToMontage + ' ' + pathToThumbs + ' -tile x1 -geometry +0+0 ' + pathToSprite;
 		exec(cliCommand, function(error, stdout, stderr) {
 			threadCounter = threadCounter - 1;
-			//console.log("threadCounter = "+threadCounter);
 			if (error !== null) {
 				log.error('Error: Failed to generate following sprite: ' + pathToSprite);
-				console.log('Error: Failed to generate following sprite: ' + pathToSprite);
 			}
 			log.info('Finished sprite ' + pathToSprite);
-			//console.log('Finished sprite ' + pathToSprite);
 		});
 		// end work
 	});
 }
 
 function getVideoDurationInSeconds(pathToFfmpeg, pathToVideo) {
-	/*
-	var c2 = require('child_process');
-	var cliCommand2 = pathToFfmpeg + ' -i ' + pathToVideo;
-	var duration2 = c2.execSync(cliCommand2);
-	console.log('duration2');
-	
-	// /Duration: ([0-9]+)(\.([0-9]+))?/
-	var regex = /Duration: ([0-9]+\:?[0-9]+\:[0-9]+\:[0-9]+\.+[0-9]+)/;          
-	//  /Duration: ([0-9]+\.?[0-9]*)/;
-	var result = duration2.match(regex);
-	duration = result[0];
-	console.log('BOOM duration'+duration);
-	*/
-	
 	var c = require('child_process');
 	var cliCommand = pathToFfmpeg + ' -i ' + pathToVideo + ' 2>&1 | grep \'Duration\' | cut -d \' \' -f 4 | sed s/,//';
 	var duration = c.execSync(cliCommand);
@@ -134,14 +130,13 @@ exports.generateThumbs = function(path2thumbnails, path2videos, imgCountPerVideo
         var PATH_TO_THUMBS = path.join(PATH2SPRITE, guidList[index]);
         if (!fs.existsSync(PATH_TO_THUMBS)){
             fs.mkdirSync(PATH_TO_THUMBS);
-            console.log('create new folder: ' + PATH_TO_THUMBS);
+            log.info('create new folder: ' + PATH_TO_THUMBS);
         }
         
         // check if video exists   
         if (!fs.existsSync(VIDEO)){
 			var logMessage = 'video does not exist: ' + VIDEO;
-            console.log(logMessage);
-			log.info(logMessage);
+            log.error(logMessage);
         }
         else {         
             var imageMagickDir = config.imagemagickDirectory;
@@ -158,7 +153,6 @@ exports.generateThumbs = function(path2thumbnails, path2videos, imgCountPerVideo
 			}
 			else{
 				var logMessage = 'Error: Invalid video length: ' + videoInSeconds +' | video:' + pathToVideo;
-				console.log(logMessage);
 				log.info(logMessage);
 			}
 			
@@ -196,7 +190,7 @@ exports.execCommand = function(command, callback) {
 	const child = exec(command,
 		(error, stdout, stderr) => {
 			if (error !== null) {
-				console.log(`exec error: ${error}`);
+				log.error(`exec error: ${error}`);
 			}
 		callback();
 	});
